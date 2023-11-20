@@ -1,0 +1,53 @@
+---
+title: "autoemulate"
+subtitle: "A Python package for automated emulation"
+format:
+  revealjs:
+    incremental: true  
+jupyter: python3
+---
+
+## Why do we need emulator models?
+
+* Computational Efficiency
+* Optimization
+* Uncertainty Quantification
+
+## Projectile motion with drag
+
+![Example simulation of projectile motion with drag for 𝐶=0.01
+ kg/m and 𝑣0=100 m/s computed via numerical integration.](pics/projectile_motion.png)
+
+## Projectile motion with drag
+```{python}
+#| echo: True
+import numpy as np
+from autoemulate.experimental_design import LatinHypercube
+from autoemulate.demos.projectile import simulator
+
+lhd = LatinHypercube([(-5., 1.), (0., 1000.)])
+X = lhd.sample(150)
+y = np.array([simulator(x) for x in X])
+
+print(f"Input variables:\n{X[:5]}\n")
+print(f"Output variables:\n{y[:5]}")
+```
+
+## autoemulate
+
+```{python}
+#| echo: True
+#| output: asis
+from autoemulate.compare import AutoEmulate
+
+ae = AutoEmulate()
+ae.setup(X, y)
+best = ae.compare()
+```
+
+## autoemulate - results
+
+```{python}
+#| echo: True
+ae.print_results()
+```
