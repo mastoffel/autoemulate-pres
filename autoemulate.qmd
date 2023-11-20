@@ -1,22 +1,53 @@
 ---
 title: "autoemulate"
-subtitle: "A Python package for automated emulation"
+subtitle: "A Python package for making emulation easy"
 format:
   revealjs:
+    logo: pics/logo_white.png
     incremental: true  
+    theme: night
+    footer: "autoemulate"
 jupyter: python3
 ---
 
-## Why do we need emulator models?
+## Why do we emulate?
 
-* Computational Efficiency
+Simulations can be **slow** and **expensive**, making it hard to do:
+
+:::: {.columns}
+
+::: {.column width="50%"}
+* (Fast) prediction
+* Sensitivity analysis
 * Optimization
 * Uncertainty Quantification
+:::
+
+::: {.column width="50%"}
+![Complex simulation](pics/simulation.png)
+:::
+
+
+::::
+
+## Building an emulator is not easy
+
+1) Experimental design
+    * At which points should we run the simulation?
+        * -> each run is expensive
+
+2) Modelling
+    * Model selection 
+    * Chosing hyperparameters
+
+
 
 ## Projectile motion with drag
 
 ![Example simulation of projectile motion with drag for 𝐶=0.01
  kg/m and 𝑣0=100 m/s computed via numerical integration.](pics/projectile_motion.png)
+
+
 
 ## Projectile motion with drag
 ```{python}
@@ -32,6 +63,7 @@ y = np.array([simulator(x) for x in X])
 print(f"Input variables:\n{X[:5]}\n")
 print(f"Output variables:\n{y[:5]}")
 ```
+
 
 ## autoemulate
 
@@ -51,3 +83,38 @@ best = ae.compare()
 #| echo: True
 ae.print_results()
 ```
+
+## autoemulate - plots
+
+```{python}
+#| echo: True
+#| layout-nrow: 2
+ae.plot_results()
+```
+
+```{python}
+#| echo: True
+#| layout-nrow: 2
+ae.plot_results('GaussianProcessSk')
+```
+
+## Customising
+
+`autoemulate` runs out of the box, but can be configured!
+```{python}
+#| echo: true
+#| eval: false
+
+# set up
+ae = AutoEmulate()
+ae.setup(X, y,                      # simulation input and output
+         use_grid_search=True,      # search for best hyperparameters
+         grid_search_type='random', # hyperparameter search strategy
+         normalise=True,            # standardise input 
+         fold_strategy='kfold',     # use k-fold cross-validation
+         n_jobs=4)                  # parallelise computation
+```
+
+## Summary
+
+

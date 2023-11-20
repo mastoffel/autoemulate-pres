@@ -7,7 +7,7 @@
 <link href="autoemulate_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="autoemulate_files/libs/quarto-html/light-border.css" rel="stylesheet">
 <link href="autoemulate_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
-<link href="autoemulate_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<link href="autoemulate_files/libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.3.340">
 
   <title>autoemulate</title>
@@ -55,44 +55,44 @@
         -khtml-user-select: none; -moz-user-select: none;
         -ms-user-select: none; user-select: none;
         padding: 0 4px; width: 4em;
-        color: #aaaaaa;
       }
-    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    pre.numberSource { margin-left: 3em;  padding-left: 4px; }
     div.sourceCode
-      { color: #003b4f; background-color: #f1f3f5; }
+      { color: #f8f8f2;  }
     @media screen {
     pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
     }
-    code span { color: #003b4f; } /* Normal */
-    code span.al { color: #ad0000; } /* Alert */
-    code span.an { color: #5e5e5e; } /* Annotation */
-    code span.at { color: #657422; } /* Attribute */
-    code span.bn { color: #ad0000; } /* BaseN */
-    code span.bu { } /* BuiltIn */
-    code span.cf { color: #003b4f; } /* ControlFlow */
-    code span.ch { color: #20794d; } /* Char */
-    code span.cn { color: #8f5902; } /* Constant */
-    code span.co { color: #5e5e5e; } /* Comment */
-    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
-    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
-    code span.dt { color: #ad0000; } /* DataType */
-    code span.dv { color: #ad0000; } /* DecVal */
-    code span.er { color: #ad0000; } /* Error */
-    code span.ex { } /* Extension */
-    code span.fl { color: #ad0000; } /* Float */
-    code span.fu { color: #4758ab; } /* Function */
-    code span.im { color: #00769e; } /* Import */
-    code span.in { color: #5e5e5e; } /* Information */
-    code span.kw { color: #003b4f; } /* Keyword */
-    code span.op { color: #5e5e5e; } /* Operator */
-    code span.ot { color: #003b4f; } /* Other */
-    code span.pp { color: #ad0000; } /* Preprocessor */
-    code span.sc { color: #5e5e5e; } /* SpecialChar */
-    code span.ss { color: #20794d; } /* SpecialString */
-    code span.st { color: #20794d; } /* String */
-    code span.va { color: #111111; } /* Variable */
-    code span.vs { color: #20794d; } /* VerbatimString */
-    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
+    code span { color: #f8f8f2; } /* Normal */
+    code span.al { color: #f07178; background-color: #2a0f15; font-weight: bold; } /* Alert */
+    code span.an { color: #d4d0ab; } /* Annotation */
+    code span.at { color: #00e0e0; } /* Attribute */
+    code span.bn { color: #d4d0ab; } /* BaseN */
+    code span.bu { color: #abe338; } /* BuiltIn */
+    code span.cf { color: #ffa07a; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #abe338; } /* Char */
+    code span.cn { color: #ffd700; } /* Constant */
+    code span.co { color: #f8f8f2; font-style: italic; } /* Comment */
+    code span.cv { color: #ffd700; } /* CommentVar */
+    code span.do { color: #f8f8f2; } /* Documentation */
+    code span.dt { color: #ffa07a; } /* DataType */
+    code span.dv { color: #d4d0ab; } /* DecVal */
+    code span.er { color: #f07178; text-decoration: underline; } /* Error */
+    code span.ex { color: #00e0e0; font-weight: bold; } /* Extension */
+    code span.fl { color: #d4d0ab; } /* Float */
+    code span.fu { color: #ffa07a; } /* Function */
+    code span.im { color: #abe338; } /* Import */
+    code span.in { color: #d4d0ab; } /* Information */
+    code span.kw { color: #ffa07a; font-weight: bold; } /* Keyword */
+    code span.op { color: #ffa07a; } /* Operator */
+    code span.ot { color: #00e0e0; } /* Other */
+    code span.pp { color: #dcc6e0; } /* Preprocessor */
+    code span.re { color: #00e0e0; background-color: #f8f8f2; } /* RegionMarker */
+    code span.sc { color: #abe338; } /* SpecialChar */
+    code span.ss { color: #abe338; } /* SpecialString */
+    code span.st { color: #abe338; } /* String */
+    code span.va { color: #00e0e0; } /* Variable */
+    code span.vs { color: #abe338; } /* VerbatimString */
+    code span.wa { color: #dcc6e0; } /* Warning */
   </style>
   <link rel="stylesheet" href="autoemulate_files/libs/revealjs/dist/theme/quarto.css" id="theme">
   <link href="autoemulate_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
@@ -384,30 +384,60 @@
     }
   </style>
 </head>
-<body class="quarto-light">
+<body class="quarto-dark">
   <div class="reveal">
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
   <h1 class="title">autoemulate</h1>
-  <p class="subtitle">A Python package for automated emulation</p>
+  <p class="subtitle">A Python package for making emulation easy</p>
 
 <div class="quarto-title-authors">
 </div>
 
 </section>
-<section id="why-do-we-need-emulator-models" class="slide level2">
-<h2>Why do we need emulator models?</h2>
+<section id="why-do-we-emulate" class="slide level2">
+<h2>Why do we emulate?</h2>
+<p>Simulations can be <strong>slow</strong> and <strong>expensive</strong>, making it hard to do:</p>
+<div class="columns">
+<div class="column" style="width:50%;">
 <ul>
-<li class="fragment">Computational Efficiency</li>
+<li class="fragment">(Fast) prediction</li>
+<li class="fragment">Sensitivity analysis</li>
 <li class="fragment">Optimization</li>
 <li class="fragment">Uncertainty Quantification</li>
 </ul>
+</div><div class="column" style="width:50%;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="pics/simulation.png"></p>
+<figcaption>Complex simulation</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="building-an-emulator-is-not-easy" class="slide level2">
+<h2>Building an emulator is not easy</h2>
+<ol type="1">
+<li class="fragment">Experimental design
+<ul>
+<li class="fragment">At which points should we run the simulation?
+<ul>
+<li class="fragment">-&gt; each run is expensive</li>
+</ul></li>
+</ul></li>
+<li class="fragment">Modelling
+<ul>
+<li class="fragment">Model selection</li>
+<li class="fragment">Chosing hyperparameters</li>
+</ul></li>
+</ol>
 </section>
 <section id="projectile-motion-with-drag" class="slide level2">
 <h2>Projectile motion with drag</h2>
 
-<img data-src="projectile_motion.png" class="r-stretch quarto-figure-center"><p class="caption">Example simulation of projectile motion with drag for 𝐶=0.01 kg/m and 𝑣0=100 m/s computed via numerical integration.</p></section>
+<img data-src="pics/projectile_motion.png" class="r-stretch quarto-figure-center"><p class="caption">Example simulation of projectile motion with drag for 𝐶=0.01 kg/m and 𝑣0=100 m/s computed via numerical integration.</p></section>
 <section id="projectile-motion-with-drag-1" class="slide level2">
 <h2>Projectile motion with drag</h2>
 <div class="cell" data-execution_count="1">
@@ -423,14 +453,15 @@
 <span id="cb1-10"><a href="#cb1-10"></a><span class="bu">print</span>(<span class="ss">f"Output variables:</span><span class="ch">\n</span><span class="sc">{</span>y[:<span class="dv">5</span>]<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Input variables:
-[[-2.04568927e+00  9.70207154e+02]
- [-2.66635552e+00  2.87701262e+02]
- [-4.13667692e+00  6.08898432e+01]
- [-2.62665471e+00  8.92142976e+02]
- [-8.29249122e-01  9.91604746e+02]]
+[[-3.61783202e+00  1.71987979e+02]
+ [ 7.97238439e-01  7.40459599e+02]
+ [-1.69648889e+00  8.41083187e+02]
+ [-4.03385643e+00  9.58695274e+02]
+ [-5.16191857e-01  8.92231164e+02]]
 
 Output variables:
-[ 378.63103372  864.85380475  372.25588624 1199.27017946   30.07744748]</code></pre>
+[1.98684385e+03 8.91986292e-01 1.79093364e+02 1.65696983e+04
+ 1.52398529e+01]</code></pre>
 </div>
 </div>
 </section>
@@ -441,7 +472,6 @@ Output variables:
 <span id="cb3-3"><a href="#cb3-3"></a>ae <span class="op">=</span> AutoEmulate()</span>
 <span id="cb3-4"><a href="#cb3-4"></a>ae.setup(X, y)</span>
 <span id="cb3-5"><a href="#cb3-5"></a>best <span class="op">=</span> ae.compare()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>INFO:autoemulate:Cross-validating GaussianProcessSk… INFO:autoemulate:Parameters: {‘alpha’: 1e-10, ‘copy_X_train’: True, ’kernel__length_scale’: 1.0, ’kernel__length_scale_bounds’: (1e-05, 100000.0), ‘kernel’: RBF(length_scale=1), ‘n_restarts_optimizer’: 20, ‘normalize_y’: True, ‘optimizer’: ‘fmin_l_bfgs_b’, ‘random_state’: None} INFO:autoemulate:Cross-validating NeuralNetSk… INFO:autoemulate:Parameters: {‘activation’: ‘relu’, ‘alpha’: 0.0001, ‘hidden_layer_sizes’: (100,), ‘learning_rate’: ‘constant’, ‘learning_rate_init’: 0.001, ‘max_iter’: 200, ‘random_state’: None, ‘solver’: ‘adam’, ‘tol’: 0.0001} INFO:autoemulate:Cross-validating RandomForest… INFO:autoemulate:Parameters: {‘bootstrap’: True, ‘criterion’: ‘squared_error’, ‘max_depth’: None, ‘max_features’: 1.0, ‘max_samples’: None, ‘min_samples_leaf’: 1, ‘min_samples_split’: 2, ‘n_estimators’: 100, ‘oob_score’: False, ‘random_state’: None} INFO:autoemulate:Cross-validating RadialBasis… INFO:autoemulate:Parameters: {‘d0’: 1.0, ‘poly_degree’: -1, ‘reg’: 1e-10} INFO:autoemulate:RadialBasis is the best model, refitting on full dataset…</p>
 </section>
 <section id="autoemulate---results" class="slide level2">
 <h2>autoemulate - results</h2>
@@ -450,14 +480,55 @@ Output variables:
 <div class="cell-output cell-output-stdout">
 <pre><code>Average scores across all models:
 metric              model        r2          rsme
-0       GaussianProcessSk  0.975035  1.037093e+06
-1             NeuralNetSk -0.281344  8.952541e+07
-2             RadialBasis  0.999968  2.181826e+03
-3            RandomForest  0.944265  3.543282e+06</code></pre>
+0       GaussianProcessSk  0.999934  3.731922e+03
+1             NeuralNetSk -0.232831  5.518668e+07
+2             RadialBasis  0.999740  5.743745e+03
+3            RandomForest  0.967603  1.406310e+06</code></pre>
 </div>
 </div>
-<div class="footer footer-default">
+</section>
+<section id="autoemulate---plots" class="slide level2">
+<h2>autoemulate - plots</h2>
+<div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1"></a>ae.plot_results()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell quarto-layout-panel" data-execution_count="4">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output cell-output-display quarto-layout-cell" style="flex-basis: 100.0%;justify-content: center;">
+<p><img data-src="autoemulate_files/figure-revealjs/cell-5-output-1.png" width="1910"></p>
+</div>
+</div>
+</div>
+</div>
+<div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1"></a>ae.plot_results(<span class="st">'GaussianProcessSk'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell quarto-layout-panel" data-execution_count="5">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="cell-output cell-output-display quarto-layout-cell" style="flex-basis: 100.0%;justify-content: center;">
+<p><img data-src="autoemulate_files/figure-revealjs/cell-6-output-1.png" width="2390"></p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="customising" class="slide level2">
+<h2>Customising</h2>
+<p><code>autoemulate</code> runs out of the box, but can be configured!</p>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1"></a><span class="co"># set up</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a>ae <span class="op">=</span> AutoEmulate()</span>
+<span id="cb8-3"><a href="#cb8-3"></a>ae.setup(X, y,                      <span class="co"># simulation input and output</span></span>
+<span id="cb8-4"><a href="#cb8-4"></a>         use_grid_search<span class="op">=</span><span class="va">True</span>,      <span class="co"># search for best hyperparameters</span></span>
+<span id="cb8-5"><a href="#cb8-5"></a>         grid_search_type<span class="op">=</span><span class="st">'random'</span>, <span class="co"># hyperparameter search strategy</span></span>
+<span id="cb8-6"><a href="#cb8-6"></a>         normalise<span class="op">=</span><span class="va">True</span>,            <span class="co"># standardise input </span></span>
+<span id="cb8-7"><a href="#cb8-7"></a>         fold_strategy<span class="op">=</span><span class="st">'kfold'</span>,     <span class="co"># use k-fold cross-validation</span></span>
+<span id="cb8-8"><a href="#cb8-8"></a>         n_jobs<span class="op">=</span><span class="dv">4</span>)                  <span class="co"># parallelise computation</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="summary" class="slide level2">
+<h2>Summary</h2>
 
+<img src="pics/logo_white.png" class="slide-logo r-stretch"><div class="footer footer-default">
+<p>autoemulate</p>
 </div>
 </section>
     </div>
