@@ -10,6 +10,7 @@
 <link href="autoemulate_files/libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.3.340">
 
+  <meta name="author" content="- Martin Stoffel, Eric Daub, Steven Niederer">
   <title>autoemulate</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -393,12 +394,17 @@
   <p class="subtitle">A Python package for making emulation easy</p>
 
 <div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+- Martin Stoffel, Eric Daub, Steven Niederer 
+</div>
+</div>
 </div>
 
 </section>
 <section id="why-do-we-emulate" class="slide level2">
 <h2>Why do we emulate?</h2>
-<p>Simulations can be <strong>slow</strong> and <strong>expensive</strong>, making it hard to do:</p>
+<p>Complex simulations can be too <strong>slow</strong> and <strong>expensive</strong> for …</p>
 <div class="columns">
 <div class="column" style="width:50%;">
 <ul>
@@ -408,89 +414,104 @@
 <li class="fragment">Uncertainty Quantification</li>
 </ul>
 </div><div class="column" style="width:50%;">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="pics/simulation.png"></p>
-<figcaption>Complex simulation</figcaption>
-</figure>
-</div>
+<p><img data-src="pics/earth_simulation.png"></p>
+</div><div class="footer">
+<p>Intro</p>
 </div>
 </div>
 </section>
-<section id="building-an-emulator-is-not-easy" class="slide level2">
-<h2>Building an emulator is not easy</h2>
+<section id="building-an-emulator-is-hard" class="slide level2">
+<h2>Building an emulator is hard</h2>
 <ol type="1">
 <li class="fragment">Experimental design
 <ul>
-<li class="fragment">At which points should we run the simulation?
-<ul>
-<li class="fragment">-&gt; each run is expensive</li>
+<li class="fragment">If each run is expensive, which data should we evaluate the simulation at?</li>
 </ul></li>
-</ul></li>
-<li class="fragment">Modelling
+<li class="fragment">Creating the emulator
 <ul>
-<li class="fragment">Model selection</li>
-<li class="fragment">Chosing hyperparameters</li>
+<li class="fragment">Which model? Gaussian process, neural network, …</li>
+<li class="fragment">Which hyperparameters?</li>
 </ul></li>
 </ol>
+<ul>
+<li class="fragment">The goal of <code>autoemulate</code> is to make this easy!
+<ul>
+<li class="fragment">currently focusing on 2.</li>
+</ul></li>
+</ul>
+<div class="footer">
+<p>Intro</p>
+</div>
 </section>
-<section id="projectile-motion-with-drag" class="slide level2">
-<h2>Projectile motion with drag</h2>
+<section id="emulating-a-rocket-simulation-with-autoemulate" class="slide level2">
+<h2>Emulating a rocket simulation with <code>autoemulate</code></h2>
 
-<img data-src="pics/projectile_motion.png" class="r-stretch quarto-figure-center"><p class="caption">Example simulation of projectile motion with drag for 𝐶=0.01 kg/m and 𝑣0=100 m/s computed via numerical integration.</p></section>
-<section id="projectile-motion-with-drag-1" class="slide level2">
-<h2>Projectile motion with drag</h2>
+<img data-src="pics/rocket2.png" class="r-stretch quarto-figure-center"><div class="footer">
+<p>Rocket simulation</p>
+</div>
+</section>
+<section id="rocket-simulation" class="slide level2">
+<h2>Rocket simulation</h2>
+<div class="quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 60.0%;justify-content: center;">
 <div class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-2"><a href="#cb1-2"></a><span class="im">from</span> autoemulate.experimental_design <span class="im">import</span> LatinHypercube</span>
-<span id="cb1-3"><a href="#cb1-3"></a><span class="im">from</span> autoemulate.demos.projectile <span class="im">import</span> simulator</span>
-<span id="cb1-4"><a href="#cb1-4"></a></span>
-<span id="cb1-5"><a href="#cb1-5"></a>lhd <span class="op">=</span> LatinHypercube([(<span class="op">-</span><span class="fl">5.</span>, <span class="fl">1.</span>), (<span class="fl">0.</span>, <span class="fl">1000.</span>)])</span>
-<span id="cb1-6"><a href="#cb1-6"></a>X <span class="op">=</span> lhd.sample(<span class="dv">150</span>)</span>
-<span id="cb1-7"><a href="#cb1-7"></a>y <span class="op">=</span> np.array([simulator(x) <span class="cf">for</span> x <span class="kw">in</span> X])</span>
-<span id="cb1-8"><a href="#cb1-8"></a></span>
-<span id="cb1-9"><a href="#cb1-9"></a><span class="bu">print</span>(<span class="ss">f"Input variables:</span><span class="ch">\n</span><span class="sc">{</span>X[:<span class="dv">5</span>]<span class="sc">}</span><span class="ch">\n</span><span class="ss">"</span>)</span>
-<span id="cb1-10"><a href="#cb1-10"></a><span class="bu">print</span>(<span class="ss">f"Output variables:</span><span class="ch">\n</span><span class="sc">{</span>y[:<span class="dv">5</span>]<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Input variables:
-[[-3.61783202e+00  1.71987979e+02]
- [ 7.97238439e-01  7.40459599e+02]
- [-1.69648889e+00  8.41083187e+02]
- [-4.03385643e+00  9.58695274e+02]
- [-5.16191857e-01  8.92231164e+02]]
-
-Output variables:
-[1.98684385e+03 8.91986292e-01 1.79093364e+02 1.65696983e+04
- 1.52398529e+01]</code></pre>
+<div class="cell-output cell-output-display">
+<p><img data-src="autoemulate_files/figure-revealjs/cell-2-output-1.png" width="626" height="436"></p>
 </div>
 </div>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 40.0%;justify-content: center;">
+<ul>
+<li class="fragment">Input X: launch angle, thrust<br>
+</li>
+<li class="fragment">Output y: maximum altitude</li>
+<li class="fragment">Problem: simulation takes too long</li>
+<li class="fragment">Solution: build an emulator</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="footer">
+<p>Rocket simulation</p>
+</div>
 </section>
-<section id="autoemulate" class="slide level2">
-<h2>autoemulate</h2>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a><span class="im">from</span> autoemulate.compare <span class="im">import</span> AutoEmulate</span>
-<span id="cb3-2"><a href="#cb3-2"></a></span>
-<span id="cb3-3"><a href="#cb3-3"></a>ae <span class="op">=</span> AutoEmulate()</span>
-<span id="cb3-4"><a href="#cb3-4"></a>ae.setup(X, y)</span>
-<span id="cb3-5"><a href="#cb3-5"></a>best <span class="op">=</span> ae.compare()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="autoemulate---building-a-rocket-emulator" class="slide level2">
+<h2><code>autoemulate</code> - building a rocket emulator</h2>
+<div class="sourceCode cell-code" id="cb1" data-code-line-numbers="1|3|4|5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="im">from</span> autoemulate.compare <span class="im">import</span> AutoEmulate</span>
+<span id="cb1-2"><a href="#cb1-2"></a></span>
+<span id="cb1-3"><a href="#cb1-3"></a>ae <span class="op">=</span> AutoEmulate()</span>
+<span id="cb1-4"><a href="#cb1-4"></a>ae.setup(X, y) <span class="co"># X is thrust, launch angle, y is max altitude</span></span>
+<span id="cb1-5"><a href="#cb1-5"></a>best <span class="op">=</span> ae.compare() <span class="co"># compares models and returns the best one</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment">
+<p>Behind the scenes, <code>autoemulate</code></p>
+<ul>
+<li class="fragment">fits and cross-validates various models</li>
+<li class="fragment">optimises hyperparameters</li>
+<li class="fragment">returns the best model</li>
+</ul>
+</div>
 </section>
-<section id="autoemulate---results" class="slide level2">
-<h2>autoemulate - results</h2>
+<section id="autoemulate---basic-diagnostics" class="slide level2">
+<h2><code>autoemulate</code> - basic diagnostics</h2>
+<div class="fragment">
+<p>Table of metrics</p>
 <div class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a>ae.print_results()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a>ae.print_results()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Average scores across all models:
-metric              model        r2          rsme
-0       GaussianProcessSk  0.999934  3.731922e+03
-1             NeuralNetSk -0.232831  5.518668e+07
-2             RadialBasis  0.999740  5.743745e+03
-3            RandomForest  0.967603  1.406310e+06</code></pre>
+metric              model        r2           rsme
+0       GaussianProcessSk  0.999995       0.571067
+1             NeuralNetSk -0.962616  250019.821875
+2             RadialBasis  0.996994     367.313067
+3            RandomForest  0.844715   15675.957317</code></pre>
 </div>
 </div>
-</section>
-<section id="autoemulate---plots" class="slide level2">
-<h2>autoemulate - plots</h2>
+</div>
+<div class="fragment">
+<p>Prediction vs.&nbsp;true simulation output</p>
 <div>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1"></a>ae.plot_results()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a>ae.plot_results()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell quarto-layout-panel" data-execution_count="4">
 <div class="quarto-layout-row quarto-layout-valign-top">
 <div class="cell-output cell-output-display quarto-layout-cell" style="flex-basis: 100.0%;justify-content: center;">
@@ -499,33 +520,69 @@ metric              model        r2          rsme
 </div>
 </div>
 </div>
-<div>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1"></a>ae.plot_results(<span class="st">'GaussianProcessSk'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell quarto-layout-panel" data-execution_count="5">
-<div class="quarto-layout-row quarto-layout-valign-top">
-<div class="cell-output cell-output-display quarto-layout-cell" style="flex-basis: 100.0%;justify-content: center;">
-<p><img data-src="autoemulate_files/figure-revealjs/cell-6-output-1.png" width="2390"></p>
-</div>
-</div>
-</div>
 </div>
 </section>
-<section id="customising" class="slide level2">
-<h2>Customising</h2>
-<p><code>autoemulate</code> runs out of the box, but can be configured!</p>
-<div class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1"></a><span class="co"># set up</span></span>
-<span id="cb8-2"><a href="#cb8-2"></a>ae <span class="op">=</span> AutoEmulate()</span>
-<span id="cb8-3"><a href="#cb8-3"></a>ae.setup(X, y,                      <span class="co"># simulation input and output</span></span>
-<span id="cb8-4"><a href="#cb8-4"></a>         use_grid_search<span class="op">=</span><span class="va">True</span>,      <span class="co"># search for best hyperparameters</span></span>
-<span id="cb8-5"><a href="#cb8-5"></a>         grid_search_type<span class="op">=</span><span class="st">'random'</span>, <span class="co"># hyperparameter search strategy</span></span>
-<span id="cb8-6"><a href="#cb8-6"></a>         normalise<span class="op">=</span><span class="va">True</span>,            <span class="co"># standardise input </span></span>
-<span id="cb8-7"><a href="#cb8-7"></a>         fold_strategy<span class="op">=</span><span class="st">'kfold'</span>,     <span class="co"># use k-fold cross-validation</span></span>
-<span id="cb8-8"><a href="#cb8-8"></a>         n_jobs<span class="op">=</span><span class="dv">4</span>)                  <span class="co"># parallelise computation</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="autoemulate---customisation" class="slide level2">
+<h2><code>autoemulate</code> - customisation</h2>
+<p>-&gt; idea: balance simplicity and customisation</p>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb5" data-code-line-numbers="4|5|6|7|8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># set up</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a>ae <span class="op">=</span> AutoEmulate()</span>
+<span id="cb5-3"><a href="#cb5-3"></a>ae.setup(X, y,                      <span class="co"># simulation input and output</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a>         use_grid_search<span class="op">=</span><span class="va">True</span>,      <span class="co"># search for best hyperparameters</span></span>
+<span id="cb5-5"><a href="#cb5-5"></a>         grid_search_type<span class="op">=</span><span class="st">'random'</span>, <span class="co"># hyperparameter search strategy</span></span>
+<span id="cb5-6"><a href="#cb5-6"></a>         normalise<span class="op">=</span><span class="va">True</span>,            <span class="co"># standardise input </span></span>
+<span id="cb5-7"><a href="#cb5-7"></a>         fold_strategy<span class="op">=</span><span class="st">'kfold'</span>,     <span class="co"># use k-fold cross-validation</span></span>
+<span id="cb5-8"><a href="#cb5-8"></a>         n_jobs<span class="op">=</span><span class="dv">4</span>)                  <span class="co"># parallelise computation</span></span>
+<span id="cb5-9"><a href="#cb5-9"></a><span class="co"># ae.compare()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="summary" class="slide level2">
 <h2>Summary</h2>
+<ul>
+<li class="fragment"><code>autoemulate</code> <strong>makes emulation easy</strong>
+<ul>
+<li class="fragment">takes simulation input and output</li>
+<li class="fragment">returns emulator model</li>
+</ul></li>
+<li class="fragment">current features
+<ul>
+<li class="fragment">model selection</li>
+<li class="fragment">hyperparameter optimisation</li>
+<li class="fragment">parallelisation</li>
+<li class="fragment">compatible with the <a href="https://scikit-learn.org/stable/" data-preview-link="true">scikit-learn</a> ecosystem</li>
+</ul></li>
+</ul>
+</section>
+<section id="near-future-work" class="slide level2">
+<h2>(Near-)future work</h2>
+<ul>
+<li class="fragment"><p>deep learning + GPU support</p></li>
+<li class="fragment"><p>visual diagnostics for each model</p></li>
+<li class="fragment"><p>make contribution easy (to allow new models, metrics etc.)</p></li>
+<li class="fragment"><p>automating the <em>experimental design</em> step</p></li>
+<li class="fragment"><p>keep it simple</p></li>
+</ul>
+</section>
+<section id="collaboration" class="slide level2">
+<h2>Collaboration</h2>
+<ul>
+<li class="fragment">searching for new datasets/simulations</li>
+<li class="fragment">ideas for models / features</li>
+<li class="fragment">feedback on <code>autoemulate</code> once the MVP is ready</li>
+</ul>
+</section>
+<section id="autoemulate-github-repo" class="slide level2">
+<h2><code>autoemulate</code> GitHub repo</h2>
+<p><a href="https://github.com/alan-turing-institute/autoemulate" class="uri">https://github.com/alan-turing-institute/autoemulate</a></p>
+</section>
+<section id="glossary" class="slide level2">
+<h2>Glossary</h2>
+<ul>
+<li class="fragment"><strong>Emulator</strong>: also metamodel, surrogate model. Here: a model that approximates a simulation, but runs faster and more efficient. Any stats or machine learning model that maps inputs to outputs could be used. <a href="https://en.wikipedia.org/wiki/Gaussian_process_emulator">Gaussian Processes</a> are a popular choice.</li>
+<li class="fragment"><strong>Experimental design</strong>: choosing which points to run the simulation at to create a dataset for training an emulator. A common technique is <a href="https://en.wikipedia.org/wiki/Latin_hypercube_sampling">Latin Hypercube Sampling</a>.</li>
+<li class="fragment"><strong>Hyperparameters</strong>: parameters of a model that are not learned from the data, such as the kernel type in a Gaussian Process or the number of hidden layers in a neural network.</li>
+</ul>
 
 <img src="pics/logo_white.png" class="slide-logo r-stretch"><div class="footer footer-default">
 <p>autoemulate</p>
@@ -556,9 +613,9 @@ metric              model        r2          rsme
       // https://revealjs.com/config/
       Reveal.initialize({
 'controlsAuto': true,
-'previewLinksAuto': false,
+'previewLinksAuto': true,
 'smaller': false,
-'pdfSeparateFragments': false,
+'pdfSeparateFragments': true,
 'autoAnimateEasing': "ease",
 'autoAnimateDuration': 1,
 'autoAnimateUnmatched': true,

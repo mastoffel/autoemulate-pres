@@ -1,18 +1,23 @@
 ---
 title: "autoemulate"
 subtitle: "A Python package for making emulation easy"
+author: "- Martin Stoffel, Eric Daub, Steven Niederer"
 format:
   revealjs:
     logo: pics/logo_white.png
     incremental: true  
     theme: night
     footer: "autoemulate"
+    preview-links: auto
+    pdf-separate-fragments: true
+    pdf-max-pages-per-slide: 1
+
 jupyter: python3
 ---
 
 ## Why do we emulate?
 
-Simulations can be **slow** and **expensive**, making it hard to do:
+Complex simulations can be too **slow** and **expensive** for ...
 
 :::: {.columns}
 
@@ -24,87 +29,139 @@ Simulations can be **slow** and **expensive**, making it hard to do:
 :::
 
 ::: {.column width="50%"}
-![Complex simulation](pics/simulation.png)
+![](pics/earth_simulation.png)
+:::
+
+::: footer
+Intro
 :::
 
 
 ::::
 
-## Building an emulator is not easy
+## Building an emulator is hard
 
 1) Experimental design
-    * At which points should we run the simulation?
-        * -> each run is expensive
+    * If each run is expensive, which data should we evaluate the simulation at?
 
-2) Modelling
-    * Model selection 
-    * Chosing hyperparameters
+2) Creating the emulator
+    * Which model? Gaussian process, neural network, ...
+    * Which hyperparameters? 
 
+* The goal of `autoemulate` is to make this easy! 
+    * currently focusing on 2.
 
+::: footer
+Intro
+:::
 
-## Projectile motion with drag
+## Emulating a rocket simulation with `autoemulate`
 
-![Example simulation of projectile motion with drag for 𝐶=0.01
- kg/m and 𝑣0=100 m/s computed via numerical integration.](pics/projectile_motion.png)
+![](pics/rocket2.png){fig-align="center"}
 
+::: footer
+Rocket simulation
+:::
 
+## Rocket simulation
+:::: {layout="[ 60, 40 ]"}
 
-## Projectile motion with drag
+::: {#first-column}
+
 ```{python}
-#| echo: True
-import numpy as np
+from rocket import rocket_simulator
 from autoemulate.experimental_design import LatinHypercube
-from autoemulate.demos.projectile import simulator
+import matplotlib.pyplot as plt
+import numpy as np
+# Example usage with LatinHypercube and the simulator
+lhd = LatinHypercube([(0., 90.), (1000., 10000.)])
+X = lhd.sample(50)
+y = np.array([rocket_simulator(x) for x in X])
 
-lhd = LatinHypercube([(-5., 1.), (0., 1000.)])
-X = lhd.sample(150)
-y = np.array([simulator(x) for x in X])
+# Extract launch angles and thrusts for plotting
+launch_angles = X[:, 0]
+thrusts = X[:, 1]
 
-print(f"Input variables:\n{X[:5]}\n")
-print(f"Output variables:\n{y[:5]}")
+# Create the scatter plot
+plt.figure(figsize=(7, 5))
+sc = plt.scatter(launch_angles, thrusts, c=y, cmap='plasma', s=50)  # Increase point size to 50
+cbar = plt.colorbar(sc)  
+cbar.set_label('Maximum Altitude (m)', fontsize=15)
+plt.xlabel('Launch Angle (degrees)', fontsize=15)
+plt.ylabel('Thrust (Newtons)', fontsize=15)
+plt.grid(True)
+plt.show()
 ```
 
+:::
 
-## autoemulate
+::: {#second-column}
+
+* Input X: launch angle, thrust  
+* Output y: maximum altitude 
+* Problem: simulation takes too long 
+* Solution: build an emulator
+
+:::
+
+::::
+
+::: footer
+Rocket simulation
+:::
+
+## `autoemulate` - building a rocket emulator
 
 ```{python}
 #| echo: True
 #| output: asis
+#| code-line-numbers: "1|3|4|5"
 from autoemulate.compare import AutoEmulate
 
 ae = AutoEmulate()
-ae.setup(X, y)
-best = ae.compare()
+ae.setup(X, y) # X is thrust, launch angle, y is max altitude
+best = ae.compare() # compares models and returns the best one
 ```
+  
+. . .
 
-## autoemulate - results
+Behind the scenes, `autoemulate`
+
+* fits and cross-validates various models
+* optimises hyperparameters
+* returns the best model 
+
+
+## `autoemulate` - basic diagnostics
+
+::: {.fragment}
+
+Table of metrics
 
 ```{python}
 #| echo: True
 ae.print_results()
 ```
+:::
 
-## autoemulate - plots
+::: {.fragment}
+
+Prediction vs. true simulation output
 
 ```{python}
 #| echo: True
 #| layout-nrow: 2
 ae.plot_results()
 ```
+:::
 
-```{python}
-#| echo: True
-#| layout-nrow: 2
-ae.plot_results('GaussianProcessSk')
-```
+## `autoemulate` - customisation
 
-## Customising
-
-`autoemulate` runs out of the box, but can be configured!
+-> idea: balance simplicity and customisation
 ```{python}
 #| echo: true
 #| eval: false
-
+#| code-line-numbers: "4|5|6|7|8"
 # set up
 ae = AutoEmulate()
 ae.setup(X, y,                      # simulation input and output
@@ -113,8 +170,40 @@ ae.setup(X, y,                      # simulation input and output
          normalise=True,            # standardise input 
          fold_strategy='kfold',     # use k-fold cross-validation
          n_jobs=4)                  # parallelise computation
+# ae.compare()
 ```
 
 ## Summary
 
+* `autoemulate` **makes emulation easy**
+    * takes simulation input and output
+    * returns emulator model
+* current features
+    * model selection 
+    * hyperparameter optimisation
+    * parallelisation
+    * compatible with the [scikit-learn](https://scikit-learn.org/stable/){preview-link="true"} ecosystem
 
+
+## (Near-)future work
+
+* deep learning + GPU support
+* visual diagnostics for each model
+* make contribution easy (to allow new models, metrics etc.)
+* automating the *experimental design* step
+* keep it simple
+
+## Collaboration
+
+* searching for new datasets/simulations
+* ideas for models / features
+* feedback on `autoemulate` once the MVP is ready
+
+## `autoemulate` GitHub repo
+
+<https://github.com/alan-turing-institute/autoemulate>
+
+## Glossary
+* **Emulator**: also metamodel, surrogate model. Here: a model that approximates a simulation, but runs faster and more efficient. Any stats or machine learning model that maps inputs to outputs could be used. [Gaussian Processes](https://en.wikipedia.org/wiki/Gaussian_process_emulator) are a popular choice.
+* **Experimental design**: choosing which points to run the simulation at to create a dataset for training an emulator. A common technique is [Latin Hypercube Sampling](https://en.wikipedia.org/wiki/Latin_hypercube_sampling).
+* **Hyperparameters**: parameters of a model that are not learned from the data, such as the kernel type in a Gaussian Process or the number of hidden layers in a neural network.
