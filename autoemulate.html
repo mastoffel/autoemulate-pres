@@ -482,7 +482,7 @@
 <span id="cb1-2"><a href="#cb1-2"></a></span>
 <span id="cb1-3"><a href="#cb1-3"></a>ae <span class="op">=</span> AutoEmulate()</span>
 <span id="cb1-4"><a href="#cb1-4"></a>ae.setup(X, y) <span class="co"># X is thrust, launch angle, y is max altitude</span></span>
-<span id="cb1-5"><a href="#cb1-5"></a>best <span class="op">=</span> ae.compare() <span class="co"># compares models and returns the best one</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-5"><a href="#cb1-5"></a>best_model <span class="op">=</span> ae.compare() <span class="co"># compares models and returns the best one</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="fragment">
 <p>Behind the scenes, <code>autoemulate</code></p>
 <ul>
@@ -495,28 +495,45 @@
 <section id="autoemulate---basic-diagnostics" class="slide level2">
 <h2><code>autoemulate</code> - basic diagnostics</h2>
 <div class="fragment">
-<p>Table of metrics</p>
 <div class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a>ae.print_results()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Average scores across all models:
 metric              model        r2           rsme
-0       GaussianProcessSk  0.999995       0.571067
-1             NeuralNetSk -0.962616  250019.821875
-2             RadialBasis  0.996994     367.313067
-3            RandomForest  0.844715   15675.957317</code></pre>
+0       GaussianProcessSk  0.999994       0.727595
+1             NeuralNetSk -1.018921  255584.776562
+2             RadialBasis  0.991770    1937.629856
+3            RandomForest  0.757300   17028.687405</code></pre>
 </div>
 </div>
 </div>
 <div class="fragment">
-<p>Prediction vs.&nbsp;true simulation output</p>
+<p>Scatterplots: Prediction vs.&nbsp;true (simulation) output</p>
 <div>
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a>ae.plot_results()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell quarto-layout-panel" data-execution_count="4">
 <div class="quarto-layout-row quarto-layout-valign-top">
 <div class="cell-output cell-output-display quarto-layout-cell" style="flex-basis: 100.0%;justify-content: center;">
-<p><img data-src="autoemulate_files/figure-revealjs/cell-5-output-1.png" width="1910"></p>
+<p><img data-src="autoemulate_files/figure-revealjs/cell-5-output-1.png" width="1909"></p>
 </div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="autoemulate---using-the-rocket-emulator" class="slide level2">
+<h2><code>autoemulate</code> - using the rocket emulator</h2>
+<div class="sourceCode cell-code" id="cb5" data-code-line-numbers="1-2|3-4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># Create a grid of launch angles and thrusts</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a>X <span class="op">=</span> np.array(np.meshgrid(np.linspace(<span class="dv">0</span>, <span class="dv">90</span>, <span class="dv">100</span>), np.linspace(<span class="dv">1000</span>, <span class="dv">10000</span>, <span class="dv">100</span>))).T.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">2</span>)</span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="co"># Emulate the rocket simulation using the best model</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a>y <span class="op">=</span> best_model.predict(X)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment">
+<div class="cell" data-execution_count="6">
+<div class="cell-output cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="autoemulate_files/figure-revealjs/cell-7-output-1.png" width="496" height="363"></p>
+</figure>
 </div>
 </div>
 </div>
@@ -525,16 +542,16 @@ metric              model        r2           rsme
 <section id="autoemulate---customisation" class="slide level2">
 <h2><code>autoemulate</code> - customisation</h2>
 <p>-&gt; idea: balance simplicity and customisation</p>
-<div class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb5" data-code-line-numbers="4|5|6|7|8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># set up</span></span>
-<span id="cb5-2"><a href="#cb5-2"></a>ae <span class="op">=</span> AutoEmulate()</span>
-<span id="cb5-3"><a href="#cb5-3"></a>ae.setup(X, y,                      <span class="co"># simulation input and output</span></span>
-<span id="cb5-4"><a href="#cb5-4"></a>         use_grid_search<span class="op">=</span><span class="va">True</span>,      <span class="co"># search for best hyperparameters</span></span>
-<span id="cb5-5"><a href="#cb5-5"></a>         grid_search_type<span class="op">=</span><span class="st">'random'</span>, <span class="co"># hyperparameter search strategy</span></span>
-<span id="cb5-6"><a href="#cb5-6"></a>         normalise<span class="op">=</span><span class="va">True</span>,            <span class="co"># standardise input </span></span>
-<span id="cb5-7"><a href="#cb5-7"></a>         fold_strategy<span class="op">=</span><span class="st">'kfold'</span>,     <span class="co"># use k-fold cross-validation</span></span>
-<span id="cb5-8"><a href="#cb5-8"></a>         n_jobs<span class="op">=</span><span class="dv">4</span>)                  <span class="co"># parallelise computation</span></span>
-<span id="cb5-9"><a href="#cb5-9"></a><span class="co"># ae.compare()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb6" data-code-line-numbers="1|4|5|6|7|8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># set up</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a>ae <span class="op">=</span> AutoEmulate()</span>
+<span id="cb6-3"><a href="#cb6-3"></a>ae.setup(X, y,                      <span class="co"># simulation input and output</span></span>
+<span id="cb6-4"><a href="#cb6-4"></a>         use_grid_search<span class="op">=</span><span class="va">True</span>,      <span class="co"># search for best hyperparameters</span></span>
+<span id="cb6-5"><a href="#cb6-5"></a>         grid_search_type<span class="op">=</span><span class="st">'random'</span>, <span class="co"># hyperparameter search strategy</span></span>
+<span id="cb6-6"><a href="#cb6-6"></a>         normalise<span class="op">=</span><span class="va">True</span>,            <span class="co"># standardise input </span></span>
+<span id="cb6-7"><a href="#cb6-7"></a>         fold_strategy<span class="op">=</span><span class="st">'kfold'</span>,     <span class="co"># use k-fold cross-validation</span></span>
+<span id="cb6-8"><a href="#cb6-8"></a>         n_jobs<span class="op">=</span><span class="dv">4</span>)                  <span class="co"># parallelise computation</span></span>
+<span id="cb6-9"><a href="#cb6-9"></a><span class="co"># ae.compare()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="summary" class="slide level2">
@@ -557,11 +574,11 @@ metric              model        r2           rsme
 <section id="near-future-work" class="slide level2">
 <h2>(Near-)future work</h2>
 <ul>
-<li class="fragment"><p>deep learning + GPU support</p></li>
-<li class="fragment"><p>visual diagnostics for each model</p></li>
-<li class="fragment"><p>make contribution easy (to allow new models, metrics etc.)</p></li>
-<li class="fragment"><p>automating the <em>experimental design</em> step</p></li>
-<li class="fragment"><p>keep it simple</p></li>
+<li class="fragment">deep learning + GPU support</li>
+<li class="fragment">visual diagnostics for each model</li>
+<li class="fragment">make contribution easy (to allow new models, metrics etc.)</li>
+<li class="fragment">automating the <em>experimental design</em> step</li>
+<li class="fragment">keep it simple</li>
 </ul>
 </section>
 <section id="collaboration" class="slide level2">
@@ -570,18 +587,56 @@ metric              model        r2           rsme
 <li class="fragment">searching for new datasets/simulations</li>
 <li class="fragment">ideas for models / features</li>
 <li class="fragment">feedback on <code>autoemulate</code> once the MVP is ready</li>
+<li class="fragment">and of course: <a href="https://github.com/alan-turing-institute/autoemulate" data-preview-link="true">code</a></li>
 </ul>
+</section>
+<section id="thanks-to" class="slide level2">
+<h2>Thanks to:</h2>
+<p>Collaborators: Steven Niederer, Eric Daub</p>
+<p>And a lot of people for discussions / data:</p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li>Imperial:
+<ul>
+<li>Marina Strocchi</li>
+</ul></li>
+<li>BAS:
+<ul>
+<li>Rosie Williams</li>
+<li>Ieva Kazlauskaite</li>
+<li>Robert Arthern</li>
+</ul></li>
+</ul>
+</div><div class="column" style="width:50%;">
+<ul>
+<li>DT-TRIC / Turing:
+<ul>
+<li>Kalle Westerling</li>
+<li>Sophie Arana</li>
+<li>Keith Worden</li>
+<li>Zack Xuereb Conti</li>
+</ul></li>
+</ul>
+</div>
+</div>
 </section>
 <section id="autoemulate-github-repo" class="slide level2">
 <h2><code>autoemulate</code> GitHub repo</h2>
 <p><a href="https://github.com/alan-turing-institute/autoemulate" class="uri">https://github.com/alan-turing-institute/autoemulate</a></p>
 </section>
-<section id="glossary" class="slide level2">
-<h2>Glossary</h2>
+<section id="glossary-1" class="slide level2">
+<h2>Glossary 1</h2>
 <ul>
-<li class="fragment"><strong>Emulator</strong>: also metamodel, surrogate model. Here: a model that approximates a simulation, but runs faster and more efficient. Any stats or machine learning model that maps inputs to outputs could be used. <a href="https://en.wikipedia.org/wiki/Gaussian_process_emulator">Gaussian Processes</a> are a popular choice.</li>
+<li class="fragment"><strong>Emulator</strong>: also metamodel, surrogate model. A model that approximates a simulation, but runs faster and more efficient. Could be any machine learning model. <a href="https://en.wikipedia.org/wiki/Gaussian_process_emulator">Gaussian Processes</a> are a popular choice.</li>
 <li class="fragment"><strong>Experimental design</strong>: choosing which points to run the simulation at to create a dataset for training an emulator. A common technique is <a href="https://en.wikipedia.org/wiki/Latin_hypercube_sampling">Latin Hypercube Sampling</a>.</li>
+</ul>
+</section>
+<section id="glossary-2" class="slide level2">
+<h2>Glossary 2</h2>
+<ul>
 <li class="fragment"><strong>Hyperparameters</strong>: parameters of a model that are not learned from the data, such as the kernel type in a Gaussian Process or the number of hidden layers in a neural network.</li>
+<li class="fragment"><strong>Cross-validation</strong>: A method to evaluate models. The idea is to split data into a training and test set, train the model on the training set and evaluate it on the test set. This is repeated multiple times with different splits of the data to get a more robust estimate of the model performance.</li>
 </ul>
 
 <img src="pics/logo_white.png" class="slide-logo r-stretch"><div class="footer footer-default">

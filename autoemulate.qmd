@@ -120,7 +120,7 @@ from autoemulate.compare import AutoEmulate
 
 ae = AutoEmulate()
 ae.setup(X, y) # X is thrust, launch angle, y is max altitude
-best = ae.compare() # compares models and returns the best one
+best_model = ae.compare() # compares models and returns the best one
 ```
   
 . . .
@@ -136,8 +136,6 @@ Behind the scenes, `autoemulate`
 
 ::: {.fragment}
 
-Table of metrics
-
 ```{python}
 #| echo: True
 ae.print_results()
@@ -146,7 +144,7 @@ ae.print_results()
 
 ::: {.fragment}
 
-Prediction vs. true simulation output
+Scatterplots: Prediction vs. true (simulation) output
 
 ```{python}
 #| echo: True
@@ -155,13 +153,46 @@ ae.plot_results()
 ```
 :::
 
+## `autoemulate` - using the rocket emulator
+
+
+```{python}
+#| echo: True
+#| output: asis
+#| code-line-numbers: "1-2|3-4"
+# Create a grid of launch angles and thrusts
+X = np.array(np.meshgrid(np.linspace(0, 90, 100), np.linspace(1000, 10000, 100))).T.reshape(-1, 2)
+# Emulate the rocket simulation using the best model
+y = best_model.predict(X)
+```
+
+::: {.fragment}
+
+```{python}
+#| fig-align: center
+launch_angles = X[:, 0]
+thrusts = X[:, 1]
+
+# Create the scatter plot
+plt.figure(figsize=(5, 4))
+sc = plt.scatter(launch_angles, thrusts, c=y, cmap='plasma', s=50)  # Increase point size to 50
+cbar = plt.colorbar(sc)  
+cbar.set_label('Maximum Altitude (m)', fontsize=15)
+plt.xlabel('Launch Angle (degrees)', fontsize=15)
+plt.ylabel('Thrust (Newtons)', fontsize=15)
+plt.grid(True)
+plt.show()
+```
+
+:::
+
 ## `autoemulate` - customisation
 
 -> idea: balance simplicity and customisation
 ```{python}
 #| echo: true
 #| eval: false
-#| code-line-numbers: "4|5|6|7|8"
+#| code-line-numbers: "1|4|5|6|7|8"
 # set up
 ae = AutoEmulate()
 ae.setup(X, y,                      # simulation input and output
@@ -198,12 +229,43 @@ ae.setup(X, y,                      # simulation input and output
 * searching for new datasets/simulations
 * ideas for models / features
 * feedback on `autoemulate` once the MVP is ready
+* and of course: [code](https://github.com/alan-turing-institute/autoemulate){preview-link="true"}
+
+## Thanks to:
+
+Collaborators: Steven Niederer, Eric Daub
+
+And a lot of people for discussions / data:
+
+::: {.columns }
+::: {.column width="50%" .nonincremental}
+* Imperial:
+    * Marina Strocchi
+* BAS:
+    * Rosie Williams
+    * Ieva Kazlauskaite
+    * Robert Arthern
+:::
+
+::: {.column width="50%" .nonincremental}
+* DT-TRIC / Turing:
+    * Kalle Westerling
+    * Sophie Arana
+    * Keith Worden
+    * Zack Xuereb Conti
+:::
+:::
+
+
 
 ## `autoemulate` GitHub repo
 
 <https://github.com/alan-turing-institute/autoemulate>
 
-## Glossary
-* **Emulator**: also metamodel, surrogate model. Here: a model that approximates a simulation, but runs faster and more efficient. Any stats or machine learning model that maps inputs to outputs could be used. [Gaussian Processes](https://en.wikipedia.org/wiki/Gaussian_process_emulator) are a popular choice.
+## Glossary 1
+* **Emulator**: also metamodel, surrogate model. A model that approximates a simulation, but runs faster and more efficient. Could be any machine learning model. [Gaussian Processes](https://en.wikipedia.org/wiki/Gaussian_process_emulator) are a popular choice.
 * **Experimental design**: choosing which points to run the simulation at to create a dataset for training an emulator. A common technique is [Latin Hypercube Sampling](https://en.wikipedia.org/wiki/Latin_hypercube_sampling).
+
+## Glossary 2
 * **Hyperparameters**: parameters of a model that are not learned from the data, such as the kernel type in a Gaussian Process or the number of hidden layers in a neural network.
+* **Cross-validation**: A method to evaluate models. The idea is to split data into a training and test set, train the model on the training set and evaluate it on the test set. This is repeated multiple times with different splits of the data to get a more robust estimate of the model performance.
