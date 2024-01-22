@@ -1,0 +1,101 @@
+---
+title: "autoemulate"
+subtitle: "A Python package for making emulation easy"
+author: "- Martin Stoffel, Bryan Li, Kalle Westerling, Eric Daub, Steven Niederer"
+format:
+  revealjs:
+    #logo: pics/logo_white.png
+    #incremental: true  
+    #theme: night
+    footer: "autoemulate"
+    preview-links: auto
+    #pdf-separate-fragments: true
+    pdf-max-pages-per-slide: 1
+jupyter: python3
+---
+
+## Why do we emulate?
+
+Complex simulations can be too **slow** and **expensive** for ...
+
+:::: {.columns}
+
+::: {.column width="50%"}
+* (Fast) prediction
+* Sensitivity analysis
+* Optimization
+* Uncertainty Quantification
+:::
+
+::: {.column width="50%"}
+![](pics/earth_simulation.png)
+:::
+
+::: footer
+Intro
+:::
+
+::::
+
+## Building an emulator is not easy
+
+1) Experimental design
+    * If each run is expensive, which data should we evaluate the simulation at?
+
+2) Creating the emulator
+    * Which model? Gaussian process, neural network, ...
+    * Which hyperparameters? 
+
+* The goal of `autoemulate` is to make this easy! 
+    * currently focusing on 2.
+
+::: footer
+Intro
+:::
+
+## `autoemulate` - a Python package for automatic emulation
+
+```{python}
+#| echo: False
+import numpy as np
+from autoemulate.experimental_design import LatinHypercube
+from autoemulate.demos.projectile import simulator
+lhd = LatinHypercube([(-5., 1.), (0., 1000.)])
+X = lhd.sample(100)
+y = np.array([simulator(x) for x in X])
+```
+
+```{python}
+#| echo: True
+#| output: asis
+from autoemulate.compare import AutoEmulate
+
+ae = AutoEmulate()
+ae.setup(X, y) # X/y are simulation inputs/outputs
+best_model = ae.compare() # evaluate models and return best one
+```
+  
+. . .
+
+In three lines of code, `autoemulate`
+
+* fits/cross-validates various machine learning models
+* optimises hyperparameters
+* does scaling / dimensionality reduction
+* returns best **emulator** for your simulation
+
+## `autoemulate` - basic diagnostics
+
+
+cross-validation metrics:
+
+```{python}
+#| echo: True
+ae.print_results()
+```
+
+## (Near-)future work
+
+* more deep learning models + GPU support
+* in-depth diagnostics for each model
+* make contribution easy (to allow new models, metrics etc.)
