@@ -1,0 +1,263 @@
+---
+title: "AutoEmulate"
+subtitle: "A Python package for making emulation easy"
+author: "- Martin Stoffel"
+format:
+  revealjs:
+    logo: pics/logo_white.png
+    incremental: true  
+    theme: night
+    footer: "AutoEmulate"
+    preview-links: auto
+    pdf-separate-fragments: true
+    pdf-max-pages-per-slide: 1
+    css: styles.css
+jupyter: python3
+---
+
+## Why do we emulate?
+
+Real-world simulations are often too **slow** and **expensive** for ...
+
+:::: {.columns}
+
+::: {.column width="50%"}
+* (Fast) prediction
+* Sensitivity analysis
+* Optimization
+* Uncertainty Quantification
+:::
+
+::: {.column width="50%"}
+![](pics/earth_simulation.png)
+:::
+
+::: footer
+Intro
+:::
+
+
+::::
+
+
+::::
+
+## Building an emulator is not easy
+
+1) Experimental design
+    * Which inputs should we evaluate the simulation at?
+2) Creating the emulator
+    * Which model? Which hyperparameters? 
+3) Doing something with the emulator
+    * Sensitivity analysis, uncertainty quantification
+
+* The goal of `AutoEmulate` is to make all of this easy! 
+    * currently: best at 2., working on 1. and 3.
+
+::: footer
+Intro
+:::
+
+## Emulating a rocket simulation with `AutoEmulate`
+
+![](pics/rocket2.png){fig-align="center"}
+
+::: footer
+Rocket simulation
+:::
+
+## Rocket simulation
+:::: {layout="[ 60, 40 ]"}
+
+::: {#first-column}
+
+```{python}
+from rocket import rocket_simulator
+from autoemulate.experimental_design import LatinHypercube
+import matplotlib.pyplot as plt
+import numpy as np
+# Example usage with LatinHypercube and the simulator
+lhd = LatinHypercube([(0., 90.), (1000., 10000.)])
+X = lhd.sample(50)
+y = np.array([rocket_simulator(x) for x in X])
+
+# Extract launch angles and thrusts for plotting
+launch_angles = X[:, 0]
+thrusts = X[:, 1]
+
+# Create the scatter plot
+plt.figure(figsize=(7, 5))
+sc = plt.scatter(launch_angles, thrusts, c=y, cmap='plasma', s=50)  # Increase point size to 50
+cbar = plt.colorbar(sc)  
+cbar.set_label('Maximum Altitude (m)', fontsize=15)
+plt.xlabel('Launch Angle (degrees)', fontsize=15)
+plt.ylabel('Thrust (Newtons)', fontsize=15)
+plt.grid(True)
+plt.show()
+```
+
+:::
+
+::: {#second-column}
+
+* Input X: launch angle, thrust  
+* Output y: maximum altitude 
+* Problem: simulation takes too long 
+* Solution: build an emulator
+
+:::
+
+::::
+
+::: footer
+Rocket simulation
+:::
+
+## `AutoEmulate` - building a rocket emulator
+
+```{python}
+#| echo: True
+#| output: True
+from autoemulate.compare import AutoEmulate
+
+ae = AutoEmulate()
+ae.setup(X, y, print_setup=False)  # X=thrust,launch angle, y=altitude
+emulator = ae.compare() # compares emulators
+```
+  
+. . .
+
+Behind the scenes, `AutoEmulate` ...
+
+* **pre-processes** the data
+* **fits** and **cross-validates** various models
+* optionally: **optimises** hyperparameters
+* returns the best model (by cv-metric)
+
+## Cross-validation results {}
+
+```{python}
+#| echo: True
+#| output: True
+ae.summarise_cv()
+```
+
+
+## Cross-validation results {}
+
+```{python}
+#| echo: True
+#| layout-nrow: 2
+ae.plot_cv(n_cols=4)
+```
+
+## Evaluate the emulator on the test set
+
+```{python}
+#| echo: True
+#| output: asis
+ae.evaluate(emulator)
+```
+
+. . .
+
+
+```{python}
+#| echo: True
+#| layout-nrow: 2
+ae.plot_eval(emulator)
+```
+
+
+## `autoemulate` - using the rocket emulator
+
+
+```{python}
+#| echo: True
+#| output: asis
+# refit the emulator on all data
+# Create a grid of launch angles and thrusts
+X = np.array(np.meshgrid(np.linspace(0, 90, 100), np.linspace(1000, 10000, 100))).T.reshape(-1, 2)
+# Emulate the rocket simulation using the best model
+y = emulator.predict(X)
+```
+
+::: {.fragment}
+
+```{python}
+#| fig-align: center
+launch_angles = X[:, 0]
+thrusts = X[:, 1]
+
+# Create the scatter plot
+plt.figure(figsize=(5, 4))
+sc = plt.scatter(launch_angles, thrusts, c=y, cmap='plasma', s=50)  # Increase point size to 50
+cbar = plt.colorbar(sc)  
+cbar.set_label('Maximum Altitude (m)', fontsize=15)
+plt.xlabel('Launch Angle (degrees)', fontsize=15)
+plt.ylabel('Thrust (Newtons)', fontsize=15)
+plt.grid(True)
+plt.show()
+```
+
+:::
+
+## `autoemulate` - customisation
+
+-> idea: balance simplicity and customisation
+```{python}
+#| echo: true
+#| eval: false
+#| code-line-numbers: "1|4|5|6|7|8"
+# set up
+ae = AutoEmulate()
+ae.setup(X, y,                      # simulation input and output
+         use_grid_search=True,      # search for best hyperparameters
+         grid_search_type='random', # hyperparameter search strategy
+         normalise=True,            # standardise input 
+         fold_strategy='kfold',     # use k-fold cross-validation
+         n_jobs=4)                  # parallelise computation
+# ae.compare()
+```
+
+## Summary
+
+* `autoemulate` **makes emulation easy**
+    * automatic model optimisation/selection
+    * hyperparameter optimisation
+    * parallelisation
+    * compatible with the [scikit-learn](https://scikit-learn.org/stable/){preview-link="true"} ecosystem
+
+## Future work
+
+* experimental design 
+* emulator applications
+* iterate based on user feedback
+
+## Thanks to:
+
+::: {.columns }
+::: {.column width="50%" .nonincremental}
+##### Collaborators:  
+
+    * Steven Niederer (Imperial)
+    * Eric Daub (Turing)
+    * Kalle Westerling (Turing)
+    * Sophie Arana (Turing)
+    * Bryan Lee (Turing, Uni Edinburgh)
+    * Max Balmus (Imperial, Turing)
+:::
+
+::: {.column width="50%" .nonincremental}
+##### Discussions / data:  
+
+    * Keith Worden (Turing)
+    * Zack Xuereb Conti (Turing)
+    * Marina Strocchi (Imperial)
+    * Rosie Williams (BAS)
+    * Ieva Kazlauskaite (BAS)
+    * Robert Arthern (BAS)
+:::
+:::
+
+![](pics/contributors.png)
