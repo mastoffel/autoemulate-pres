@@ -1,7 +1,7 @@
 ---
 title: "AutoEmulate"
 subtitle: "A Python package for making emulation easy"
-author: "- Martin Stoffel"
+author: "Martin Stoffel, Alan Turing Institute"
 format:
   revealjs:
     logo: pics/logo_white.png
@@ -36,62 +36,62 @@ Real-world simulations are often too **slow** and **expensive** for ...
 Intro
 :::
 
-
 ::::
 
-
-::::
-
-## Building an emulator is not easy
+## Building a (good) emulator is hard
 
 1) Experimental design
     * Which inputs should we evaluate the simulation at?
-2) Creating the emulator
+2) Creating an emulator
     * Which model? Which hyperparameters? 
-3) Doing something with the emulator
+3) Applying the emulator
     * Sensitivity analysis, uncertainty quantification
 
 * The goal of `AutoEmulate` is to make all of this easy! 
-    * currently: best at 2., working on 1. and 3.
 
 ::: footer
 Intro
 :::
 
-## Emulating a rocket simulation with `AutoEmulate`
+## Emulating an epidemic simulation with `AutoEmulate`
 
-![](pics/rocket2.png){fig-align="center"}
+![](pics/epidemic.png){fig-align="center"}
 
 ::: footer
-Rocket simulation
+Epidemic simulation
 :::
 
-## Rocket simulation
-:::: {layout="[ 60, 40 ]"}
+## Epidemic simulation
+:::: {layout="[ 55, 45 ]"}
 
 ::: {#first-column}
 
 ```{python}
-from rocket import rocket_simulator
+from autoemulate.simulations.epidemic import simulate_epidemic
 from autoemulate.experimental_design import LatinHypercube
 import matplotlib.pyplot as plt
 import numpy as np
-# Example usage with LatinHypercube and the simulator
-lhd = LatinHypercube([(0., 90.), (1000., 10000.)])
-X = lhd.sample(50)
-y = np.array([rocket_simulator(x) for x in X])
+
+plt.style.use('default')  # Apply dark background style
+
+beta = (0.1, 0.5) # lower and upper bounds for the transmission rate
+gamma = (0.01, 0.2) # lower and upper bounds for the recovery rate
+lhd = LatinHypercube([beta, gamma])
+X = lhd.sample(70)
+y = np.array([simulate_epidemic(x) for x in X])
 
 # Extract launch angles and thrusts for plotting
-launch_angles = X[:, 0]
-thrusts = X[:, 1]
+beta = X[:, 0]
+gamma = X[:, 1]
 
 # Create the scatter plot
 plt.figure(figsize=(7, 5))
-sc = plt.scatter(launch_angles, thrusts, c=y, cmap='plasma', s=50)  # Increase point size to 50
+sc = plt.scatter(beta, gamma, c=y, cmap='plasma', s=50)  # Increase point size to 50
+
 cbar = plt.colorbar(sc)  
-cbar.set_label('Maximum Altitude (m)', fontsize=15)
-plt.xlabel('Launch Angle (degrees)', fontsize=15)
-plt.ylabel('Thrust (Newtons)', fontsize=15)
+cbar.set_label('Maximum number of infections', fontsize=15)
+plt.xlabel('Transmission rate', fontsize=15)
+plt.ylabel('Recovery rate', fontsize=15)
 plt.grid(True)
 plt.show()
 ```
@@ -100,8 +100,8 @@ plt.show()
 
 ::: {#second-column}
 
-* Input X: launch angle, thrust  
-* Output y: maximum altitude 
+* Input **X**: transmission rate, recovery rate  
+* Output **y**: maximum number of infections 
 * Problem: simulation takes too long 
 * Solution: build an emulator
 
@@ -110,19 +110,19 @@ plt.show()
 ::::
 
 ::: footer
-Rocket simulation
+Epidemic simulation
 :::
 
-## `AutoEmulate` - building a rocket emulator
+## `AutoEmulate` - building an epidemic emulator
 
 ```{python}
 #| echo: True
-#| output: True
+#| output: False
 from autoemulate.compare import AutoEmulate
 
 ae = AutoEmulate()
-ae.setup(X, y, print_setup=False)  # X=thrust,launch angle, y=altitude
-emulator = ae.compare() # compares emulators
+ae.setup(X, y)    # X=transmission rate,recovery rate; y=max infections
+ae.compare()      # compares and cross-validates various models
 ```
   
 . . .
@@ -131,10 +131,9 @@ Behind the scenes, `AutoEmulate` ...
 
 * **pre-processes** the data
 * **fits** and **cross-validates** various models
-* optionally: **optimises** hyperparameters
-* returns the best model (by cv-metric)
+* optionally: **optimises** model hyperparameters
 
-## Cross-validation results {}
+## Cross-validation results {.smaller}
 
 ```{python}
 #| echo: True
@@ -143,68 +142,83 @@ ae.summarise_cv()
 ```
 
 
-## Cross-validation results {}
+## Cross-validation results {.smaller}
 
 ```{python}
 #| echo: True
 #| layout-nrow: 2
-ae.plot_cv(n_cols=4)
+ae.plot_cv(n_cols=3, model='GaussianProcess')
 ```
 
-## Evaluate the emulator on the test set
+## Evaluate on the test set
 
 ```{python}
 #| echo: True
 #| output: asis
-ae.evaluate(emulator)
-```
-
-. . .
-
-
-```{python}
-#| echo: True
-#| layout-nrow: 2
-ae.plot_eval(emulator)
+gp = ae.get_model("GaussianProcess")
+ae.evaluate(gp)
 ```
 
 
-## `autoemulate` - using the rocket emulator
+## Emulator: Prediction
 
 
 ```{python}
 #| echo: True
 #| output: asis
-# refit the emulator on all data
-# Create a grid of launch angles and thrusts
-X = np.array(np.meshgrid(np.linspace(0, 90, 100), np.linspace(1000, 10000, 100))).T.reshape(-1, 2)
-# Emulate the rocket simulation using the best model
-y = emulator.predict(X)
+gp = ae.refit(gp) # use all data to fit the emulator
+
+# Create 10k inputs to predict on
+X = np.array(np.meshgrid(np.linspace(0.1, 0.5, 100), np.linspace(0.01, 0.2, 100))).T.reshape(-1, 2)
+
+# Emulate the epidemic simulation using the best model
+y = gp.predict(X)
 ```
 
-::: {.fragment}
 
 ```{python}
+#| echo: False
+#| output: asis
 #| fig-align: center
-launch_angles = X[:, 0]
-thrusts = X[:, 1]
+beta = X[:, 0]
+gamma = X[:, 1]
 
 # Create the scatter plot
-plt.figure(figsize=(5, 4))
-sc = plt.scatter(launch_angles, thrusts, c=y, cmap='plasma', s=50)  # Increase point size to 50
+plt.figure(figsize=(2, 1.5))  # Adjust the figure size to be larger than 1.5x1.5 for better visibility
+sc = plt.scatter(beta, gamma, c=y, cmap='plasma', s=30)  # Reduce point size to 30
 cbar = plt.colorbar(sc)  
-cbar.set_label('Maximum Altitude (m)', fontsize=15)
-plt.xlabel('Launch Angle (degrees)', fontsize=15)
-plt.ylabel('Thrust (Newtons)', fontsize=15)
+cbar.set_label('Maximum \n % infections', fontsize=8)  # Reduce font size
+cbar.ax.tick_params(labelsize=7) 
+plt.xlabel('Transmission rate', fontsize=8)  # Reduce font size
+plt.ylabel('Recovery rate', fontsize=8)  # Reduce font size
+plt.xticks(fontsize=7)
+plt.yticks(fontsize=7)
+
 plt.grid(True)
 plt.show()
 ```
 
-:::
 
-## `autoemulate` - customisation
+## Emulator: Sensitivity analysis
+
+```{python}
+#| echo: True
+#| output: asis
+#| out-width: 50%
+#| fig-align: center
+from autoemulate.sensitivity_analysis import sensitivity_analysis, plot_sensitivity_analysis
+
+problem = {'num_vars': 2,'names': ['beta', 'gamma'],
+            'bounds': [[0.1, 0.5], [0.01, 0.2]]}
+
+results = sensitivity_analysis(gp, problem, as_df=True)
+plot_sensitivity_analysis(results)
+```
+
+## Customisation {}
 
 -> idea: balance simplicity and customisation
+
 ```{python}
 #| echo: true
 #| eval: false
@@ -212,27 +226,39 @@ plt.show()
 # set up
 ae = AutoEmulate()
 ae.setup(X, y,                      # simulation input and output
-         use_grid_search=True,      # search for best hyperparameters
-         grid_search_type='random', # hyperparameter search strategy
-         normalise=True,            # standardise input 
-         fold_strategy='kfold',     # use k-fold cross-validation
+         param_search=True,         # search for best hyperparameters
+         scale_inputs=True,         # standardise input 
+         cross_validator=KFold(),   # use k-fold cross-validation
+         reduce_dim=True,           # reduce dimensionality
          n_jobs=4)                  # parallelise computation
 # ae.compare()
 ```
 
-## Summary
 
-* `autoemulate` **makes emulation easy**
-    * automatic model optimisation/selection
-    * hyperparameter optimisation
-    * parallelisation
+## Take-away
+
+* `AutoEmulate` **makes emulation easy**
+    * provides various emulator models incl. cutting-edge Neural Processes
+    * semi-automated model selection / optimisation
     * compatible with the [scikit-learn](https://scikit-learn.org/stable/){preview-link="true"} ecosystem
+    * simple, but customisable
+    * *soon*: emulator applications like sensitivity analysis
 
 ## Future work
 
-* experimental design 
-* emulator applications
-* iterate based on user feedback
+:::: {.columns}
+
+::: {.column width="50%"}
+* goal: `AutoEmulate` as an end-to-end low-code emulation framework
+* it's open source: please test it, provide feedback, and contribute!
+:::
+
+::: {.column width="50%"}
+
+![](pics/github_pic_dark.png)
+:::
+
+::::
 
 ## Thanks to:
 
@@ -258,6 +284,10 @@ ae.setup(X, y,                      # simulation input and output
     * Ieva Kazlauskaite (BAS)
     * Robert Arthern (BAS)
 :::
+:::
+
+::: footer
+https://github.com/alan-turing-institute/autoemulate
 :::
 
 ![](pics/contributors.png)

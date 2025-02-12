@@ -3,10 +3,10 @@ title: "autoemulate"
 subtitle: "A Python package for making emulation easy"
 author: "- Martin Stoffel, Eric Daub, Steven Niederer"
 format:
-  revealjs:
+  pptx:
     logo: pics/logo_white.png
     incremental: true  
-    #theme: night
+    theme: night
     footer: "autoemulate"
     preview-links: auto
     pdf-separate-fragments: true
@@ -118,8 +118,8 @@ Rocket simulation
 from autoemulate.compare import AutoEmulate
 
 ae = AutoEmulate()
-ae.setup(X, y)               # X=thrust,launch angle, y=max altitude
-best_emulator = ae.compare() # compares emulators
+ae.setup(X, y)                  # X=thrust, launch angle, y=max altitude
+best_emulator = ae.compare()    # compare models
 ```
   
 . . .
@@ -131,16 +131,21 @@ Behind the scenes, `autoemulate`
 * returns the best model 
 
 
-## {.scrollable .smaller}
+## `autoemulate` - basic diagnostics
+
+::: {.fragment}
 
 ```{python}
 #| echo: True
+best_model = ae.compare()
+best_model
 ae.print_results()
 ```
 :::
 
+::: {.fragment}
 
-## 
+Scatterplots: Prediction vs. true (simulation) output
 
 ```{python}
 #| echo: True
@@ -149,24 +154,17 @@ ae.plot_results()
 ```
 :::
 
-## 
-
-```{python}
-#| echo: True
-#| layout-nrow: 2
-ae.plot_model(best_emulator, figsize=(4, 3))
-```
-
 ## `autoemulate` - using the rocket emulator
 
 
 ```{python}
 #| echo: True
 #| output: asis
+#| code-line-numbers: "1-2|3-4"
 # Create a grid of launch angles and thrusts
 X = np.array(np.meshgrid(np.linspace(0, 90, 100), np.linspace(1000, 10000, 100))).T.reshape(-1, 2)
 # Emulate the rocket simulation using the best model
-y = best_emulator.predict(X)
+y = best_model.predict(X)
 ```
 
 ::: {.fragment}
