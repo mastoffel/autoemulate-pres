@@ -1,0 +1,35 @@
+---
+title: "slides_for_chris"
+subtitle: "A Python package for making emulation easy"
+author: "- Martin Stoffel, Eric Daub, Steven Niederer"
+format:
+  revealjs:
+    logo: pics/logo_white.png
+    incremental: true  
+    #theme: night
+    footer: "autoemulate"
+    preview-links: auto
+    pdf-separate-fragments: true
+    pdf-max-pages-per-slide: 1
+
+jupyter: python3
+---
+
+## AutoEmulate - AutoML for surrogate modeling
+
+:::: {.columns}
+
+::: {.column width="50%"}
+* (Fast) prediction
+* Sensitivity analysis
+* Optimization
+* Uncertainty Quantification
+:::
+
+::: {.column width="50%"}
+![](pics/github_pic.png)
+:::
+
+::: footer
+Intro
+:::

@@ -1,0 +1,116 @@
+---
+title: "AutoEmulate"
+subtitle: "A Python package for making emulation easy"
+author: "Martin Stoffel, Alan Turing Institute"
+format:
+  revealjs:
+    logo: pics/logo_white.png
+    # incremental: true  
+    footer: "AutoEmulate"
+    preview-links: auto
+    pdf-separate-fragments: true
+    pdf-max-pages-per-slide: 1
+    css: styles.css
+jupyter: python3
+---
+
+## Simulation
+
+```{python}
+#| echo: true
+#| eval: true
+from autoemulate.compare import AutoEmulate
+from autoemulate.simulations.epidemic import simulate_epidemic
+from autoemulate.experimental_design import LatinHypercube
+import numpy as np
+
+beta, gamma = (0.1, 0.5), (0.01, 0.2)
+lhd = LatinHypercube([beta, gamma])
+X = lhd.sample(100)
+y = np.array([simulate_epidemic(x) for x in X])
+```
+
+## Running AutoEmulate
+```{python}
+#| echo: false
+#| eval: true
+ae = AutoEmulate()
+ae.setup(X, y)
+ae.compare()
+ae.plot_cv()
+```
+
+##
+
+```{python}
+#| echo: true
+#| eval: false
+
+from autoemulate.compare import AutoEmulate
+
+ae = AutoEmulate()
+ae.setup(X, y)                          # customise pipeline
+ae.compare()                            # runs the pipeline
+ae.plot_cv()                            # visualise results
+ae.summarise_cv()                       # metrics for each model
+emulator = ae.get_model("GaussianProcess")
+ae.evaluate(emulator)                   # calculate test set scores
+ae.plot_eval(emulator)                  # visualise test set predictions
+emulator = ae.refit(emulator)           # refit using full data
+emulator.predict(X)                     # emulate!
+ae.sensitivity_analysis(emulator)       # global SA with Sobol indices
+```
+
+## 
+
+```{python}
+#| echo: true
+#| eval: false
+# creating an emulator
+ae = AutoEmulate()
+ae.setup(X, y)                    # allows to customise pipeline 
+emulator = ae.compare()           # compares emulators & returns best one
+# cross-validation results
+ae.summarise_cv()                 # cv metrics for each model
+ae.plot_cv()                      # visualise best cv fold per model
+# evaluating the emulator
+ae.evaluate(emulator)             # test set scores
+emulator = ae.refit(emulator)     # refit using full data
+# application
+emulator.predict(X)               # generate new samples
+ae.sensitivity_analysis(emulator) # global SA with Sobol indices
+```
+
+## {.smaller}
+
+```{python}
+#| echo: true
+#| eval: true
+import numpy as np
+from autoemulate.compare import AutoEmulate
+from autoemulate.experimental_design import LatinHypercube
+from autoemulate.simulations.projectile import simulate_projectile
+
+# sampling
+lhd = LatinHypercube([(-5., 1.), (0., 1000.)])
+X = lhd.sample(50)
+y = np.array([simulate_projectile(x) for x in X])
+
+# creating an emulator
+ae = AutoEmulate()
+ae.setup(X, y)                    # change pre-processing, parameter search etc.
+emulator = ae.compare()           # compares emulators & returns best one
+ae.evaluate(emulator)             # test set scores
+emulator = ae.refit(emulator)     # refit using full data
+
+# application
+emulator.predict(X)               # prediction
+#ae.sensitivity_analysis(emulator) # global SA with Sobol indices
+```
+
+## 
+```{python}
+#| echo: true
+#| eval: true
+ae.plot_cv(model="GaussianProcess", n_cols=5, figsize=(5,5))
+```
